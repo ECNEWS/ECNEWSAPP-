@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EC News App</title>
+  <!-- Bootstrap CSS for responsive UI -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Algolia InstantSearch.js for search feature -->
+  <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.10.5/dist/algoliasearch-lite.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
+  <!-- i18next for multilingual support -->
+  <script src="https://unpkg.com/i18next@21.6.5/dist/umd/i18next.min.js"></script>
+  <!-- OneSignal for Push Notifications -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+  <!-- Firebase for Authentication & Messaging -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-messaging-compat.js"></script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+    .flag { width: 40px; position: fixed; top: 10px; left: 10px; }
+    .install-btn { margin: .5rem; }
+    #news-list { margin-top: 2rem; }
+  </style>
+</head>
+<body class="container">
+  <!-- TIRANGA FLAG -->
+  <img src="images/flag.png" alt="तिरंगा" class="flag">
+  <!-- HEADER -->
+  <header class="my-4 text-center">
+    <h1 id="title">ईसी न्यूज अ‍ॅप</h1>
+    <p id="subtitle">ग्रामीण बातम्या ऐकण्याचा सोयीस्कर मार्ग</p>
+  </header>
+
+  <!-- INSTALL OPTIONS -->
+  <div class="text-center">
+    <a href="https://yourdomain.com/ecnews.apk" class="btn btn-primary install-btn"><i class="fas fa-download"></i> APK डाउनलोड करा</a>
+    <button id="installBtn" class="btn btn-success install-btn"><i class="fas fa-mobile-alt"></i> PWA इंस्टॉल करा</button>
+  </div>
+
+  <!-- PASSWORD SECTION -->
+  <div id="password-section" class="my-4">
+    <h2><i class="fas fa-lock"></i> सुरक्षित प्रवेश</h2>
+    <div class="input-group mb-3">
+      <input type="password" id="appPassword" class="form-control" placeholder="पासवर्ड" />
+      <button class="btn btn-outline-secondary" onclick="verifyPassword()">प्रवेश</button>
+    </div>
+  </div>
+
+  <!-- RECOVERY SECTION -->
+  <div id="recovery-section" class="my-4">
+    <h3><i class="fas fa-key"></i> पासवर्ड विसरलात?</h3>
+    <div class="input-group mb-2">
+      <input type="email" id="recoveryEmail" class="form-control" placeholder="ईमेल" />
+    </div>
+    <div class="input-group mb-2">
+      <input type="text" id="secretCode" class="form-control" placeholder="सिक्रेट कोड" />
+      <button class="btn btn-outline-secondary" onclick="recoverPassword()">रिकव्हर करा</button>
+    </div>
+  </div>
+
+  <!-- SEARCH FEATURE -->
+  <div id="search-section" class="my-4">
+    <h4><i class="fas fa-search"></i> बातम्या शोधा</h4>
+    <div id="searchbox"></div>
+    <div id="hits"></div>
+  </div>
+
+  <!-- NEWS LIST PLACEHOLDER -->
+  <div id="news-list" class="row"></div>
+
+  <!-- COMMENTS (Disqus) -->
+  <div id="comments" class="my-4">
+    <div id="disqus_thread"></div>
+    <script>
+      var disqus_config = function () { this.page.url = window.location.href; this.page.identifier = 'ecnews'; };
+      (function() { var d = document, s = d.createElement('script'); s.src = 'https://your-disqus-shortname.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date()); (d.head||d.body).appendChild(s); })();
+    </script>
+  </div>
+
+  <!-- AI RECOMMENDATION PLACEHOLDER -->
+  <script>
+    // TODO: Integrate AI recommendation engine (e.g., TensorFlow.js or GPT-API)
+  </script>
+
+  <!-- SCRIPTS -->
+  <script>
+    // i18next multilingual init
+    i18next.init({ lng: 'mr', resources: { mr: { translation: { title: 'ईसी न्यूज अ‍ॅप', subtitle: 'ग्रामीण बातम्या ऐकण्याचा सोयीस्कर मार्ग' } } } }, function(err, t) { document.getElementById('title').innerText = i18next.t('title'); document.getElementById('subtitle').innerText = i18next.t('subtitle'); });
+
+    // Algolia Search init
+    const searchClient = algoliasearch('APP_ID', 'SEARCH_ONLY_API_KEY');
+    const search = instantsearch({ indexName: 'news_index', searchClient });
+    search.addWidgets([
+      instantsearch.widgets.searchBox({ container: '#searchbox' }),
+      instantsearch.widgets.hits({ container: '#hits', templates: { item: '<div class="card mb-2"><div class="card-body">{{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}<p>{{#helpers.highlight}}{ "attribute": "excerpt" }{{/helpers.highlight}}</p></div></div>' } })
+    ]);
+    search.start();
+
+    // OneSignal Push Notifications
+    window.OneSignal = window.OneSignal || [];
+    OneSignal.push(function() { OneSignal.init({ appId: 'YOUR_ONESIGNAL_APP_ID' }); });
+
+    // Firebase Messaging (fallback)
+    const firebaseConfig = { /* YOUR FIREBASE CONFIG */ };
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    // PWA Install
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').style.display = 'inline-block'; });
+    document.getElementById('installBtn').addEventListener('click', () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => deferredPrompt = null); } });
+
+    // Speech Synthesis Marathi Female
+    function speak(message) {
+      const utter = new SpeechSynthesisUtterance(message);
+      utter.lang = 'mr-IN';
+      utter.voice = speechSynthesis.getVoices().find(v => v.lang === 'mr-IN' && /female/i.test(v.name));
+      speechSynthesis.speak(utter);
+    }
+
+    // Password logic
+    const correctPassword = 'ecnews2025';
+    function verifyPassword() {
+      if (document.getElementById('appPassword').value === correctPassword) { speak('स्वागत आहे'); alert('प्रवेश यशस्वी'); } else { alert('चुकीचा पासवर्ड'); }
+    }
+    function recoverPassword() {
+      if (document.getElementById('recoveryEmail').value === 'user@example.com' && document.getElementById('secretCode').value === 'ecsecure') {
+        alert('तुमचा पासवर्ड: ' + correctPassword); speak('तुमचा पासवर्ड ecnews2025 आहे');
+      } else { alert('ईमेल किंवा सिक्रेट कोड चुकीचा आहे'); }
+    }
+  </script>
+
+  <!-- Disqus noscript fallback -->
+  <noscript>कृपया <a href="https://disqus.com/?ref_noscript">Disqus</a> सक्षम करा.</noscript>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
