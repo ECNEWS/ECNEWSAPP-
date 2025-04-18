@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EC News App</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    .button { padding: 10px 20px; margin: 10px; border: none; border-radius: 10px; background: #2b7cff; color: white; cursor: pointer; }
+    textarea { width: 100%; height: 100px; padding: 10px; margin-top: 10px; }
+    .license { margin-top: 50px; font-size: 12px; color: gray; }
+  </style>
+</head>
+<body oncontextmenu="return false">
+
+  <h1>EC NEWS APP पत्रकार पृष्ठ</h1>
+
+  <!-- पत्रकार अकाउंट बटन -->
+  <button class="button" onclick="alert('पत्रकार अकाउंट निर्माण पद्धत येथून सुरू होईल.')">पत्रकार बना</button>
+
+  <!-- ब्लॉग पोस्ट -->
+  <textarea id="newsContent" placeholder="आपकी न्यूज़ यहाँ लिखें..."></textarea><br>
+  <button class="button" onclick="postNews()">न्यूज़ पोस्ट करें</button>
+  <button class="button" onclick="speakText()">AI आवाज में पढ़ें</button>
+  <button class="button" onclick="downloadPDF()">PDF सेव करें</button>
+
+  <!-- सोशल शेयर बटन -->
+  <br><br>
+  <button class="button" onclick="alert('पोस्ट फेसबुक पर शेयर की जाएगी')">📢 शेयर करें</button>
+  <button class="button" onclick="alert('आपने इस न्यूज़ को पसंद किया')">👍 लाइक</button>
+  <button class="button" onclick="alert('अब आप इस पत्रकार को फॉलो कर रहे हैं')">👤 फॉलो</button>
+
+  <!-- Google Translate -->
+  <div id="google_translate_element" style="margin-top: 20px;"></div>
+
+  <!-- GitHub लाइसेंस -->
+  <div class="license">
+    <p>© 2025 Akash Chinchole - EC News App. Licensed under <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>.</p>
+    <p>18 वर्ष से कम बच्चों के लिए अनुचित सामग्री की अनुमति नहीं। सभी समाचार और मीडिया कानूनों का पालन किया जाएगा।</p>
+  </div>
+
+  <!-- SCRIPT ZONE -->
+  <script>
+    // Text to Speech
+    function speakText() {
+      let msg = new SpeechSynthesisUtterance(document.getElementById("newsContent").value);
+      msg.lang = 'hi-IN';
+      speechSynthesis.speak(msg);
+    }
+
+    // Dummy Post Function
+    function postNews() {
+      alert("आपकी न्यूज़ सेव हो गई! (डेमो)");
+    }
+
+    // Download as PDF (Simple Text Save)
+    function downloadPDF() {
+      let text = document.getElementById("newsContent").value;
+      let blob = new Blob([text], { type: "application/pdf" });
+      let link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = "EC_NEWS.pdf";
+      link.click();
+    }
+
+    // Disable copy
+    document.addEventListener('copy', function(e) {
+      e.preventDefault();
+      alert('कॉपी प्रोटेक्टेड कंटेंट!');
+    });
+  </script>
+
+  <!-- Google Translate Script -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({ pageLanguage: 'mr' }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
