@@ -1,0 +1,724 @@
+आपका <!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EC News - भारतीय पत्रकारों के लिए AI-संचालित ब्लॉगिंग प्लेटफॉर्म">
+    <meta name="keywords" content="EC News, ब्लॉगिंग, पत्रकार, भारतीय खबरें, AI लेख जनरेटर">
+    <title>EC News - पत्रकार ब्लॉग</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .post-card {
+            transition: transform 0.2s;
+        }
+        .post-card:hover {
+            transform: scale(1.02);
+        }
+        .language-switcher button {
+            margin: 0 5px;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .ai-tool {
+            background-color: #e6f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        const { useState, useEffect } = React;
+
+        const translations = {
+            mr: {
+                title: "EC News - पत्रकार ब्लॉग",
+                login: "लॉगिन करा",
+                logout: "लॉगआउट",
+                welcome: "स्वागत आहे, {name}!",
+                newPost: "नवीन लेख लिहा",
+                postTitle: "लेखाचे शीर्षक",
+                postContent: "लेखाची सामग्री",
+                location: "स्थान (उदा., पुणे, मुंबई)",
+                language: "भाषा",
+                publish: "प्रकाशित करा",
+                posts: "लेखांची यादी",
+                noPosts: "कोणतेही लेख उपलब्ध नाहीत.",
+                comment: "टिप्पणी लिहा",
+                submitComment: "टिप्पणी सबमिट करा",
+                share: "शेअर करा",
+                languageSwitch: "भाषा बदला",
+                aiTool: "AI लेख जनरेटर",
+                aiPrompt: "लेखाचा विषय (उदा., पुण्यातील स्थानिक बातम्या)",
+                aiTone: "लेखाचा टोन",
+                generate: "लेख तयार करा",
+                copyContent: "सामग्री कॉपी करा",
+                aiGenerated: "AI ने तयार केलेला लेख",
+                formal: "औपचारिक",
+                informal: "अनौपचारिक",
+                news: "बातमी"
+            },
+            hi: {
+                title: "EC News - पत्रकार ब्लॉग",
+                login: "लॉगिन करें",
+                logout: "लॉगआउट",
+                welcome: "नमस्ते, {name}!",
+                newPost: "नया लेख लिखें",
+                postTitle: "लेख का शीर्षक",
+                postContent: "लेख की सामग्री",
+                location: "स्थान (उदा., पुणे, मुंबई)",
+                language: "भाषा",
+                publish: "प्रकाशित करें",
+                posts: "लेखों की सूची",
+                noPosts: "कोई लेख उपलब्ध नहीं हैं।",
+                comment: "टिप्पणी लिखें",
+                submitComment: "टिप्पणी सबमिट करें",
+                share: "शेयर करें",
+                languageSwitch: "भाषा बदलें",
+                aiTool: "AI लेख जनरेटर",
+                aiPrompt: "लेख का विषय (उदा., पुणे की स्थानीय खबरें)",
+                aiTone: "लेख का टोन",
+                generate: "लेख उत्पन्न करें",
+                copyContent: "सामग्री कॉपी करें",
+                aiGenerated: "AI द्वारा उत्पन्न लेख",
+                formal: "औपचारिक",
+                informal: "अनौपचारिक",
+                news: "समाचार"
+            },
+            en: {
+                title: "EC News - Journalist Blog",
+                login: "Login",
+                logout: "Logout",
+                welcome: "Welcome, {name}!",
+                newPost: "Write a New Post",
+                postTitle: "Post Title",
+                postContent: "Post Content",
+                location: "Location (e.g., Pune, Mumbai)",
+                language: "Language",
+                publish: "Publish",
+                posts: "List of Posts",
+                noPosts: "No posts available.",
+                comment: "Write a comment",
+                submitComment: "Submit Comment",
+                share: "Share",
+                languageSwitch: "Change Language",
+                aiTool: "AI Article Generator",
+                aiPrompt: "Article topic (e.g., Local news in Pune)",
+                aiTone: "Article tone",
+                generate: "Generate Article",
+                copyContent: "Copy Content",
+                aiGenerated: "AI-Generated Article",
+                formal: "Formal",
+                informal: "Informal",
+                news: "News"
+            }
+        };
+
+        // सिम्युलेटेड AI टूल के लिए टेम्पलेट्स
+        const articleTemplates = {
+            mr: {
+                news: {
+                    formal: "पुण्यातील {topic} बद्दल नवीन घडामोडी समोर आल्या आहेत। {content} यामुळे स्थानिक समुदायात चर्चा सुरू झाली आहे। अधिक माहितीसाठी, स्थानिक प्रशासनाने {extra} ची घोषणा केली आहे।",
+                    informal: "पुण्यात {topic} ची जोरदार चर्चा आहे! {content} आणि लोकांना याबद्दल खूप उत्सुकता आहे। {extra} पाहायला विसरू नका!",
+                },
+                general: {
+                    formal: "{topic} बद्दल एक नवीन दृष्टिकोन समोर आला आहे। {content} यामुळे {location} मध्ये नवीन संधी निर्माण होऊ शकतात।",
+                    informal: "ए, {topic} बद्दल ऐकलं का? {content} आणि {location} मध्ये याची खूप चर्चा आहे!"
+                }
+            },
+            hi: {
+                news: {
+                    formal: "पुणे में {topic} को लेकर नई घटनाएँ सामने आई हैं। {content} इससे स्थानीय समुदाय में चर्चा शुरू हो गई है। अधिक जानकारी के लिए, स्थानीय प्रशासन ने {extra} की घोषणा की है।",
+                    informal: "पुणे में {topic} की जबरदस्त चर्चा है! {content} और लोग इसके बारे में बहुत उत्साहित हैं। {extra} देखना न भूलें!",
+                },
+                general: {
+                    formal: "{topic} को लेकर एक नया दृष्टिकोण सामने आया है। {content} इससे {location} में नई संभावनाएँ पैदा हो सकती हैं।",
+                    informal: "अरे, {topic} के बारे में सुना क्या? {content} और {location} में इसकी खूब चर्चा है!"
+                }
+            },
+            en: {
+                news: {
+                    formal: "New developments regarding {topic} have emerged in Pune. {content} This has sparked discussions in the local community. For more details, the local administration has announced {extra}.",
+                    informal: "Pune is buzzing with {topic}! {content} and people are super excited about it. Don’t miss out on {extra}!",
+                },
+                general: {
+                    formal: "A new perspective on {topic} has emerged. {content} This could create new opportunities in {location}.",
+                    informal: "Yo, heard about {topic}? {content} and it’s all the rage in {location}!"
+                }
+            }
+        };
+
+        const BlogPlatform = () => {
+            const [user, setUser] = useState(null);
+            const [posts, setPosts] = useState(JSON.parse(localStorage.getItem('posts')) || []);
+            const [newPost, setNewPost] = useState({ title: '', content: '', language: 'mr', location: '' });
+            const [language, setLanguage] = useState('mr');
+            const [comment, setComment] = useState('');
+            const [aiPrompt, setAiPrompt] = useState('');
+            const [aiTone, setAiTone] = useState('formal');
+            const [aiGeneratedContent, setAiGeneratedContent] = useState('');
+
+            // स्थानीय स्टोरेज में पोस्ट्स को सहेजें
+            useEffect(() => {
+                localStorage.setItem('posts', JSON.stringify(posts));
+            }, [posts]);
+
+            // लॉगिन सिमुलेशन
+            const handleLogin = () => {
+                setUser({ name: 'पत्रकार १', id: 'user123' });
+            };
+
+            // लॉगआउट
+            const handleLogout = () => {
+                setUser(null);
+            };
+
+            // नया पोस्ट सबमिट करें
+            const handleSubmit = () => {
+                if (newPost.title && newPost.content) {
+                    const post = {
+                        id: Date.now(),
+                        ...newPost,
+                        author: user.name,
+                        comments: [],
+                        createdAt: new Date().toLocaleString()
+                    };
+                    setPosts([...posts, post]);
+                    setNewPost({ title: '', content: '', language: 'mr', location: '' });
+                } else {
+                    alert(translations[language].postTitle + ' आणि ' + translations[language].postContent + ' भरा.');
+                }
+            };
+
+            // टिप्पणी सबमिट करें
+            const handleCommentSubmit = (postId) => {
+                if (comment) {
+                    const updatedPosts = posts.map(post => {
+                        if (post.id === postId) {
+                            return { ...post, comments: [...post.comments, { text: comment, author: user.name }] };
+                        }
+                        return post;
+                    });
+                    setPosts(updatedPosts);
+                    setComment('');
+                }
+            };
+
+            // सोशल शेयरिंग
+            const sharePost = (post) => {
+                const shareUrl = `https://ecnews.com/post/${post.id}`;
+                const shareText = `${post.title} - ${post.content.substring(0, 100)}...`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: post.title,
+                        text: shareText,
+                        url: shareUrl
+                    }).catch(err => console.error('Share failed:', err));
+                } else {
+                    alert(`Share this: ${shareUrl}`);
+                }
+            };
+
+            // भाषा बदलें
+            const changeLanguage = (lang) => {
+                setLanguage(lang);
+                setNewPost({ ...newPost, language: lang });
+            };
+
+            // AI लेख जनरेट करें
+            const generateArticle = () => {
+                if (!aiPrompt) {
+                    alert(translations[language].aiPrompt + ' प्रविष्ट करा.');
+                    return;
+                }
+
+                // सिम्युलेटेड AI: टेम्पलेट का उपयोग
+                const template = articleTemplates[language].news[aiTone] || articleTemplates[language].general[aiTone];
+                const content = template
+                    .replace('{topic}', aiPrompt)
+                    .replace('{content}', `हा विषय ${aiPrompt} याबद्दल आहे आणि स्थानिक लोकांसाठी महत्त्वाचा आहे.`)
+                    .replace('{location}', newPost.location || 'स्थानिक समुदाय')
+                    .replace('{extra}', 'स्थानिक बातम्यांचा पाठपुरावा करा');
+
+                // Unsplash से रैंडम छवि URL
+                const imageUrl = `https://source.unsplash.com/600x400/?${encodeURIComponent(aiPrompt)}`;
+                const videoUrl = `https://www.pexels.com/search/videos/${encodeURIComponent(aiPrompt)}/`;
+
+                const generatedContent = `
+${content}
+
+### जोडलेली छवि:
+![${aiPrompt}](${imageUrl})
+
+### संबंधित व्हिडिओ:
+[${aiPrompt} व्हिडिओ](${videoUrl})
+                `;
+
+                setAiGeneratedContent(generatedContent);
+                setNewPost({ ...newPost, content: generatedContent, title: aiPrompt });
+            };
+
+            // सामग्री कॉपी करें
+            const copyContent = () => {
+                if (aiGeneratedContent) {
+                    navigator.clipboard.writeText(aiGeneratedContent)
+                        .then(() => alert('सामग्री कॉपी केली गेली!'))
+                        .catch(err => console.error('Copy failed:', err));
+                }
+            };
+
+            const t = translations[language];
+
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-3xl font-bold text-center mb-4">{t.title}</h1>
+
+                    {/* भाषा स्विचर */}
+                    <div className="language-switcher mb-4 text-center">
+                        <span>{t.languageSwitch}: </span>
+                        <button
+                            className={`px-2 py-1 rounded ${language === 'mr' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => changeLanguage('mr')}
+                        >
+                            मराठी
+                        </button>
+                        <button
+                            className={`px-2 py-1 rounded ${language === 'hi' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => changeLanguage('hi')}
+                        >
+                            हिंदी
+                        </button>
+                        <button
+                            className={`px-2 py-1 rounded ${language === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => changeLanguage('en')}
+                        >
+                            English
+                        </button>
+                    </div>
+
+                    {/* लॉगिन/लॉगआउट */}
+                    {!user ? (
+                        <button
+                            className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+                            onClick={handleLogin}
+                        >
+                            {t.login}
+                        </button>
+                    ) : (
+                        <div className="mb-4 flex justify-between items-center">
+                            <p>{t.welcome.replace('{name}', user.name)}</p>
+                            <button
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                                onClick={handleLogout}
+                            >
+                                {t.logout}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ब्लॉग पोस्ट एडिटर */}
+                    {user && (
+                        <div className="bg-white p-4 rounded shadow mb-4">
+                            <h2 className="text-xl font-semibold mb-2">{t.newPost}</h2>
+
+                            {/* AI लेख जनरेटर */}
+                            <div className="ai-tool mb-4">
+                                <h3 className="text-lg font-semibold">{t.aiTool}</h3>
+                                <input
+                                    type="text"
+                                    placeholder={t.aiPrompt}
+                                    className="w-full p-2 mb-2 border rounded"
+                                    value={aiPrompt}
+                                    onChange={e => setAiPrompt(e.target.value)}
+                                />
+                                <select
+                                    className="w-full p-2 mb-2 border rounded"
+                                    value={aiTone}
+                                    onChange={e => setAiTone(e.target.value)}
+                                >
+                                    <option value="formal">{t.formal}</option>
+                                    <option value="informal">{t.informal}</option>
+                                    <option value="news">{t.news}</option>
+                                </select>
+                                <button
+                                    className="bg-purple-500 text-white px-4 py-2 rounded mr-2"
+                                    onClick={generateArticle}
+                                >
+                                    {t.generate}
+                                </button>
+                                {aiGeneratedContent && (
+                                    <button
+                                        className="bg-gray-500 text-white px-4 py-2 rounded"
+                                        onClick={copyContent}
+                                    >
+                                        {t.copyContent}
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* मैन्युअल एडिटर */}
+                            <input
+                                type="text"
+                                placeholder={t.postTitle}
+                                className="w-full p-2 mb-2 border rounded"
+                                value={newPost.title}
+                                onChange={e => setNewPost({ ...newPost, title: e.target.value })}
+                            />
+                            <textarea
+                                placeholder={t.postContent}
+                                className="w-full p-2 mb-2 border rounded"
+                                rows="5"
+                                value={newPost.content}
+                                onChange={e => setNewPost({ ...newPost, content: e.target.value })}
+                            ></textarea>
+                            <input
+                                type="text"
+                                placeholder={t.location}
+                                className="w-full p-2 mb-2 border rounded"
+                                value={newPost.location}
+                                onChange={e => setNewPost({ ...newPost, location: e.target.value })}
+                            />
+                            <select
+                                className="w-full p-2 mb-2 border rounded"
+                                value={newPost.language}
+                                onChange={e => setNewPost({ ...newPost, language: e.target.value })}
+                            >
+                                <option value="mr">मराठी</option>
+                                <option value="hi">हिंदी</option>
+                                <option value="en">English</option>
+                            </select>
+                            <button
+                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                onClick={handleSubmit}
+                            >
+                                {t.publish}
+                            </button>
+                            {aiGeneratedContent && (
+                                <div className="mt-4 p-4 bg-gray-100 rounded">
+                                    <h4 className="font-semibold">{t.aiGenerated}</h4>
+                                    <pre className="whitespace-pre-wrap">{aiGeneratedContent}</pre>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* ब्लॉग पोस्ट लिस्ट */}
+                    <div>
+                        <h2 className="text-xl font-semibold mb-2">{t.posts}</h2>
+                        {posts.length === 0 ? (
+                            <p>{t.noPosts}</p>
+                        ) : (
+                            posts.map(post => (
+                                <div key={post.id} className="post-card bg-white p-4 rounded shadow mb-4">
+                                    <h3 className="text-lg font-bold">{post.title}</h3>
+                                    <p>{post.content.substring(0, 100)}...</p>
+                                    <p className="text-sm text-gray-500">
+                                        लेखक: {post.author} | स्थान: {post.location || 'N/A'} | भाषा: {post.language} | तारीख: {post.createdAt}
+                                    </p>
+                                    <button
+                                        className="text-blue-500 underline mt-2"
+                                        onClick={() => sharePost(post)}
+                                    >
+                                        {t.share}
+                                    </button>
+
+                                    {/* टिप्पणी अनुभाग */}
+                                    {user && (
+                                        <div className="mt-4">
+                                            <textarea
+                                                placeholder={t.comment}
+                                                className="w-full p-2 mb-2 border rounded"
+                                                value={comment}
+                                                onChange={e => setComment(e.target.value)}
+                                            ></textarea>
+                                            <button
+                                                className="bg-green-500 text-white px-4 py-2 rounded"
+                                                onClick={() => handleCommentSubmit(post.id)}
+                                            >
+                                                {t.submitComment}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {post.comments.length > 0 && (
+                                        <div className="mt-2">
+                                            <h4 className="font-semibold">टिप्पण्या:</h4>
+                                            {post.comments.map((c, index) => (
+                                                <p key={index} className="text-sm">
+                                                    <strong>{c.author}:</strong> {c.text}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<BlogPlatform />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('mr')}>मराठी</button>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('hi')}>हिंदी</button>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('en')}>English</button>
+                    </div>
+
+                    {/* लॉगिन / लॉगआउट */}
+                    <div className="text-center mb-4">
+                        {user ? (
+                            <div>
+                                <p>{t.welcome.replace('{name}', user.name)}</p>
+                                <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-2">{t.logout}</button>
+                            </div>
+                        ) : (
+                            <button onClick={handleLogin} className="bg-blue-500 text-white px-4 py-2 rounded">{t.login}</button>
+                        )}
+                    </div>
+
+                    {/* नवीन लेख */}
+                    {user && (
+                        <div className="bg-white p-4 rounded shadow mb-6">
+                            <h2 className="text-xl font-semibold mb-2">{t.newPost}</h2>
+                            <input
+                                type="text"
+                                placeholder={t.postTitle}
+                                value={newPost.title}
+                                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <textarea
+                                placeholder={t.postContent}
+                                value={newPost.content}
+                                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder={t.location}
+                                value={newPost.location}
+                                onChange={(e) => setNewPost({ ...newPost, location: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <button onClick={handleSubmit} className="bg-green-500 text-white px-4 py-2 rounded">{t.publish}</button>
+                        </div>
+                    )}
+
+                    {/* लेखांची यादी */}
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">{t.posts}</h2>
+                        {posts.length === 0 ? (
+                            <p>{t.noPosts}</p>
+                        ) : (
+                            posts.map(post => (
+                                <div key={post.id} className="post-card bg-white p-4 rounded shadow mb-4">
+                                    <h3 className="text-xl font-semibold">{post.title}</h3>
+                                    <p className="text-gray-700">{post.content}</p>
+                                    <p className="text-sm text-gray-500">{post.location} | {post.createdAt} | {post.author}</p>
+                                    <div className="mt-2">
+                                        <input
+                                            type="text"
+                                            placeholder={t.comment}
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                            className="w-full border p-1 rounded mb-2"
+                                        />
+                                        <button onClick={() => handleCommentSubmit(post.id)} className="bg-blue-400 text-white px-2 py-1 rounded mr-2">{t.submitComment}</button>
+                                        <button onClick={() => sharePost(post)} className="bg-yellow-400 text-white px-2 py-1 rounded">{t.share}</button>
+                                    </div>
+                                    <ul className="mt-2 text-sm text-gray-600">
+                                        {post.comments.map((c, idx) => (
+                                            <li key={idx}>💬 <strong>{c.author}:</strong> {c.text}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<BlogPlatform />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('mr')}>मराठी</button>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('hi')}>हिंदी</button>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('en')}>English</button>
+                    </div>
+
+                    {/* लॉगिन / लॉगआउट */}
+                    <div className="text-center mb-4">
+                        {user ? (
+                            <div>
+                                <p>{t.welcome.replace('{name}', user.name)}</p>
+                                <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-2">{t.logout}</button>
+                            </div>
+                        ) : (
+                            <button onClick={handleLogin} className="bg-blue-500 text-white px-4 py-2 rounded">{t.login}</button>
+                        )}
+                    </div>
+
+                    {/* नवीन लेख */}
+                    {user && (
+                        <div className="bg-white p-4 rounded shadow mb-6">
+                            <h2 className="text-xl font-semibold mb-2">{t.newPost}</h2>
+                            <input
+                                type="text"
+                                placeholder={t.postTitle}
+                                value={newPost.title}
+                                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <textarea
+                                placeholder={t.postContent}
+                                value={newPost.content}
+                                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder={t.location}
+                                value={newPost.location}
+                                onChange={(e) => setNewPost({ ...newPost, location: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <button onClick={handleSubmit} className="bg-green-500 text-white px-4 py-2 rounded">{t.publish}</button>
+                        </div>
+                    )}
+
+                    {/* लेखांची यादी */}
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">{t.posts}</h2>
+                        {posts.length === 0 ? (
+                            <p>{t.noPosts}</p>
+                        ) : (
+                            posts.map(post => (
+                                <div key={post.id} className="post-card bg-white p-4 rounded shadow mb-4">
+                                    <h3 className="text-xl font-semibold">{post.title}</h3>
+                                    <p className="text-gray-700">{post.content}</p>
+                                    <p className="text-sm text-gray-500">{post.location} | {post.createdAt} | {post.author}</p>
+                                    <div className="mt-2">
+                                        <input
+                                            type="text"
+                                            placeholder={t.comment}
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                            className="w-full border p-1 rounded mb-2"
+                                        />
+                                        <button onClick={() => handleCommentSubmit(post.id)} className="bg-blue-400 text-white px-2 py-1 rounded mr-2">{t.submitComment}</button>
+                                        <button onClick={() => sharePost(post)} className="bg-yellow-400 text-white px-2 py-1 rounded">{t.share}</button>
+                                    </div>
+                                    <ul className="mt-2 text-sm text-gray-600">
+                                        {post.comments.map((c, idx) => (
+                                            <li key={idx}>💬 <strong>{c.author}:</strong> {c.text}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<BlogPlatform />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('mr')}>मराठी</button>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('hi')}>हिंदी</button>
+                        <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => changeLanguage('en')}>English</button>
+                    </div>
+
+                    {/* लॉगिन / लॉगआउट */}
+                    <div className="text-center mb-4">
+                        {user ? (
+                            <div>
+                                <p>{t.welcome.replace('{name}', user.name)}</p>
+                                <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded mt-2">{t.logout}</button>
+                            </div>
+                        ) : (
+                            <button onClick={handleLogin} className="bg-blue-500 text-white px-4 py-2 rounded">{t.login}</button>
+                        )}
+                    </div>
+
+                    {/* नवीन लेख */}
+                    {user && (
+                        <div className="bg-white p-4 rounded shadow mb-6">
+                            <h2 className="text-xl font-semibold mb-2">{t.newPost}</h2>
+                            <input
+                                type="text"
+                                placeholder={t.postTitle}
+                                value={newPost.title}
+                                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <textarea
+                                placeholder={t.postContent}
+                                value={newPost.content}
+                                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <input
+                                type="text"
+                                placeholder={t.location}
+                                value={newPost.location}
+                                onChange={(e) => setNewPost({ ...newPost, location: e.target.value })}
+                                className="w-full border p-2 mb-2 rounded"
+                            />
+                            <button onClick={handleSubmit} className="bg-green-500 text-white px-4 py-2 rounded">{t.publish}</button>
+                        </div>
+                    )}
+
+                    {/* लेखांची यादी */}
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">{t.posts}</h2>
+                        {posts.length === 0 ? (
+                            <p>{t.noPosts}</p>
+                        ) : (
+                            posts.map(post => (
+                                <div key={post.id} className="post-card bg-white p-4 rounded shadow mb-4">
+                                    <h3 className="text-xl font-semibold">{post.title}</h3>
+                                    <p className="text-gray-700">{post.content}</p>
+                                    <p className="text-sm text-gray-500">{post.location} | {post.createdAt} | {post.author}</p>
+                                    <div className="mt-2">
+                                        <input
+                                            type="text"
+                                            placeholder={t.comment}
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                            className="w-full border p-1 rounded mb-2"
+                                        />
+                                        <button onClick={() => handleCommentSubmit(post.id)} className="bg-blue-400 text-white px-2 py-1 rounded mr-2">{t.submitComment}</button>
+                                        <button onClick={() => sharePost(post)} className="bg-yellow-400 text-white px-2 py-1 rounded">{t.share}</button>
+                                    </div>
+                                    <ul className="mt-2 text-sm text-gray-600">
+                                        {post.comments.map((c, idx) => (
+                                            <li key={idx}>💬 <strong>{c.author}:</strong> {c.text}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<BlogPlatform />, document.getElementById('root'));
+    </script>
+</body>
+</html>
