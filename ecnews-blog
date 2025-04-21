@@ -1,4 +1,4 @@
-आपका <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
@@ -215,18 +215,20 @@
 
             // सोशल शेयरिंग
             const sharePost = (post) => {
-                const shareUrl = `https://ecnews.com/post/${post.id}`;
-                const shareText = `${post.title} - ${post.content.substring(0, 100)}...`;
-                if (navigator.share) {
-                    navigator.share({
-                        title: post.title,
-                        text: shareText,
-                        url: shareUrl
-                    }).catch(err => console.error('Share failed:', err));
-                } else {
-                    alert(`Share this: ${shareUrl}`);
-                }
-            };
+    const shareUrl = `https://github.com/ECNEWS/ecnews-blog-app.git`;
+    const shareText = `${post.title} - ${post.content.substring(0, 100)}...`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: post.title,
+            text: shareText,
+            url: shareUrl
+        }).catch(err => console.error('Share failed:', err));
+    } else {
+        alert(`Share this: ${shareUrl}`);
+    }
+};
+
 
             // भाषा बदलें
             const changeLanguage = (lang) => {
