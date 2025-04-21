@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EC NEWS - PWA</title>
+  <meta name="theme-color" content="#1976d2"/>
+
+  <!-- Inline PWA Manifest -->
+  <script type="application/manifest+json" id="pwa-manifest">
+  {
+    "name": "EC NEWS",
+    "short_name": "ECNEWS",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1976d2",
+    "icons": [
+      {
+        "src": "data:image/png;base64,<!-- BASE64_ICON_192 -->",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "data:image/png;base64,<!-- BASE64_ICON_512 -->",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    body { margin:0; font-family:sans-serif; background:#f9f9f9; padding:1rem; }
+    header { background:#1976d2; color:#fff; text-align:center; padding:1rem; }
+    article { background:#fff; margin:1rem 0; padding:1rem; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+
+  <header>📢 EC NEWS</header>
+
+  <article>
+    <h2>पुण्यातील हवामान बदल!</h2>
+    <p>नवीन हवामान अंदाजानुसार येत्या काही दिवसांत पावसाचे प्रमाण वाढणार आहे.</p>
+  </article>
+
+  <article>
+    <h2>खेळातील मोठा विजय</h2>
+    <p>भारताने आंतरराष्ट्रीय सामने जिंकत ऐतिहासिक कामगिरी केली.</p>
+  </article>
+
+  <script>
+    // --- Service Worker Inline Code ---
+    const swCode = `
+      const CACHE_NAME = "ecnews-cache-v1";
+      const assets = ["/", "index.html"];
+      self.addEventListener("install", e =>
+        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(assets)))
+      );
+      self.addEventListener("fetch", e =>
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)))
+      );
+    `;
+    if ('serviceWorker' in navigator) {
+      const blob = new Blob([swCode], { type: 'text/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl)
+        .then(() => console.log("✅ SW Registered"))
+        .catch(err => console.error("❌ SW Registration Failed", err));
+    }
+
+    // --- Inject Manifest Link ---
+    const manifestEl = document.getElementById("pwa-manifest");
+    const manifestBlob = new Blob([manifestEl.textContent], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = manifestURL;
+    document.head.appendChild(link);
+  </script>
+
+</body>
+</html>
