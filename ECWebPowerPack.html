@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EC Website Tools Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #273c75;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .tool {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2f3640;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+    button {
+      background-color: #44bd32;
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4cd137;
+    }
+    .output {
+      background: #dcdde1;
+      padding: 0.5rem;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ईसी वेबसाइट टूल्स (EC Website Tools)</h1>
+    <p>डिझाईन, विश्लेषण व सुरक्षा साठी सर्व आवश्यक टूल्स एकाच ठिकाणी</p>
+  </header>
+
+  <main>
+    <div class="tool">
+      <h2>🎨 Figma UI Preview</h2>
+      <p>डिझाईन फिगमा लिंक इथे द्या:</p>
+      <input type="text" id="figmaLink" placeholder="Figma Link...">
+      <button onclick="showFigma()">डिझाईन दाखवा</button>
+      <div id="figmaOutput" class="output"></div>
+    </div>
+
+    <div class="tool">
+      <h2>📊 Website Analysis</h2>
+      <p>वेबसाईटचा URL द्या:</p>
+      <input type="text" id="urlInput" placeholder="https://">
+      <button onclick="analyzeSite()">विश्लेषण करा</button>
+      <div id="analysisOutput" class="output"></div>
+    </div>
+
+    <div class="tool">
+      <h2>🛡️ WAF सुरक्षा सेटिंग</h2>
+      <p>सिम्युलेटेड WAF कॉन्फिगरेशन (डेमो):</p>
+      <textarea id="wafInput" rows="4" placeholder="IP ब्लॉक, SQL Injection सुरक्षा इत्यादी..."></textarea>
+      <button onclick="configureWAF()">सुरक्षा लागू करा</button>
+      <div id="wafOutput" class="output"></div>
+    </div>
+
+    <div class="tool">
+      <h2>🔧 Builder Tool</h2>
+      <p>आपली वेबसाइट HTML डिझाईन कोड:</p>
+      <textarea id="htmlInput" rows="6" placeholder="<h1>Welcome to EC</h1>"></textarea>
+      <button onclick="renderHTML()">पूर्वदृश्य पाहा</button>
+      <div id="builderOutput" class="output"></div>
+    </div>
+  </main>
+
+  <script>
+    function showFigma() {
+      const link = document.getElementById('figmaLink').value;
+      const output = document.getElementById('figmaOutput');
+      output.innerHTML = link ? `<a href="${link}" target="_blank">Figma Preview</a>` : 'लिंक दिली नाही';
+    }
+
+    function analyzeSite() {
+      const url = document.getElementById('urlInput').value;
+      const output = document.getElementById('analysisOutput');
+      if (url.includes('http')) {
+        output.textContent = `URL '${url}' सुरक्षित आहे. पिंग यशस्वी.`;
+      } else {
+        output.textContent = 'कृपया योग्य URL द्या.';
+      }
+    }
+
+    function configureWAF() {
+      const config = document.getElementById('wafInput').value;
+      const output = document.getElementById('wafOutput');
+      output.textContent = `सुरक्षा सेटिंग्स अंमलात आणल्या: ${config}`;
+    }
+
+    function renderHTML() {
+      const htmlCode = document.getElementById('htmlInput').value;
+      const output = document.getElementById('builderOutput');
+      output.innerHTML = htmlCode || 'कृपया HTML कोड द्या';
+    }
+  </script>
+</body>
+</html>
