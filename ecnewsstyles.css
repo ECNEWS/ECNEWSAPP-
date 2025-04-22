@@ -1,0 +1,144 @@
+/*
+  Akash Chinchole EC News Styles
+  Fully Custom & Unique CSS
+*/
+
+:root {
+  --ec-border-radius: 10px;
+  --ec-shadow-spread: 10px;
+}
+
+/* Layout Containers */
+.ecnews-content-outer {
+  border-radius: var(--ec-border-radius);
+  box-shadow: 0 0 var(--ec-shadow-spread) rgba(0, 0, 0, 0.15);
+  margin: auto;
+}
+
+.ecnews-content-inner {
+  padding: 20px;
+}
+
+/* Header */
+.ecnews-header-outer {
+  background: linear-gradient(to right, #f2f2f2, #ffffff);
+  color: #333;
+  border-radius: var(--ec-border-radius);
+}
+
+.ecnews-header-outer img,
+.ecnews-header-inner #ecnews-header-inner {
+  border-radius: var(--ec-border-radius);
+}
+
+.ecnews-header-inner .ecnews-titlewrapper,
+.ecnews-header-inner .ecnews-descriptionwrapper {
+  padding: 0 20px;
+}
+
+.ecnews-header-outer h1 {
+  font: bold 28px Arial, sans-serif;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.ecnews-header-outer h1 a {
+  color: #333;
+}
+
+.ecnews-header-outer .ecnews-description {
+  font-size: 130%;
+}
+
+/* Tabs */
+.ecnews-tabs-inner {
+  margin: 0.5em 10px 20px;
+  padding: 0;
+}
+
+.ecnews-tabs-inner .ecnews-section {
+  margin: 0;
+}
+
+.ecnews-tabs-inner .ecnews-widget ul {
+  padding: 0;
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  border-radius: var(--ec-border-radius);
+}
+
+.ecnews-tabs-inner .ecnews-widget li {
+  border: none;
+}
+
+.ecnews-tabs-inner .ecnews-widget li a {
+  display: inline-block;
+  padding: 0.5em 1em;
+  margin-inline-end: 5px;
+  color: #222;
+  font: bold 14px Arial, sans-serif;
+  border-radius: var(--ec-border-radius) var(--ec-border-radius) 0 0;
+  background: #e6e6e6;
+  border-inline-end: 1px solid #ccc;
+}
+
+.ecnews-tabs-inner .ecnews-widget li:first-child a {
+  padding-inline-start: 1.25em;
+  border-start-start-radius: 12px;
+  border-end-start-radius: 12px;
+}
+
+.ecnews-tabs-inner .ecnews-widget li.ecnews-selected a,
+.ecnews-tabs-inner .ecnews-widget li a:hover {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(to bottom, #ffffff, #dcdcdc);
+  color: #000;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Headings */
+.ecnews-heading-2,
+h2 {
+  font: bold 20px Verdana, sans-serif;
+  text-transform: uppercase;
+  color: #444;
+  margin: 0.5em 0;
+}
+
+/* Main Section */
+.ecnews-main-outer {
+  background: #fff;
+  border-radius: var(--ec-border-radius) var(--ec-border-radius) 0 0;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.ecnews-main-inner {
+  padding: 15px 20px 20px;
+}
+
+.ecnews-main-inner .ecnews-column-center-inner,
+.ecnews-main-inner .ecnews-column-left-inner,
+.ecnews-main-inner .ecnews-column-right-inner {
+  padding: 0;
+}
+
+/* Posts */
+.ecnews-post-title,
+h3.post-title {
+  margin: 0;
+  font: bold 24px Georgia, serif;
+}
+
+.ecnews-comments h4 {
+  margin: 1em 0 0;
+  font: bold 20px Georgia, serif;
+}
+
+.ecnews-date-header span {
+  color: #999;
+}
+
+.ecnews-post-outer {
+  background-color: #fefefe;
+  border: 1px solid #ccc;
+  border-radius: var(--ec-border-radius);
+}
