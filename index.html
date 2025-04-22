@@ -1,85 +1,142 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="mr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EC NEWS - PWA</title>
-  <meta name="theme-color" content="#1976d2"/>
-
-  <!-- Inline PWA Manifest -->
-  <script type="application/manifest+json" id="pwa-manifest">
-  {
-    "name": "EC NEWS",
-    "short_name": "ECNEWS",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#1976d2",
-    "icons": [
-      {
-        "src": "data:image/png;base64,<!-- BASE64_ICON_192 -->",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "data:image/png;base64,<!-- BASE64_ICON_512 -->",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  }
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EC News - Akash Chinchole</title>
 
   <style>
-    body { margin:0; font-family:sans-serif; background:#f9f9f9; padding:1rem; }
-    header { background:#1976d2; color:#fff; text-align:center; padding:1rem; }
-    article { background:#fff; margin:1rem 0; padding:1rem; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-  </style>
-</head>
-<body>
+    /*
+      Akash Chinchole EC News Styles
+      Fully Custom & Unique CSS
+    */
 
-  <header>📢 EC NEWS</header>
-
-  <article>
-    <h2>पुण्यातील हवामान बदल!</h2>
-    <p>नवीन हवामान अंदाजानुसार येत्या काही दिवसांत पावसाचे प्रमाण वाढणार आहे.</p>
-  </article>
-
-  <article>
-    <h2>खेळातील मोठा विजय</h2>
-    <p>भारताने आंतरराष्ट्रीय सामने जिंकत ऐतिहासिक कामगिरी केली.</p>
-  </article>
-
-  <script>
-    // --- Service Worker Inline Code ---
-    const swCode = `
-      const CACHE_NAME = "ecnews-cache-v1";
-      const assets = ["/", "index.html"];
-      self.addEventListener("install", e =>
-        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(assets)))
-      );
-      self.addEventListener("fetch", e =>
-        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)))
-      );
-    `;
-    if ('serviceWorker' in navigator) {
-      const blob = new Blob([swCode], { type: 'text/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(swUrl)
-        .then(() => console.log("✅ SW Registered"))
-        .catch(err => console.error("❌ SW Registration Failed", err));
+    :root {
+      --border-radius: 10px;
+      --shadow-spread: 10px;
     }
 
-    // --- Inject Manifest Link ---
-    const manifestEl = document.getElementById("pwa-manifest");
-    const manifestBlob = new Blob([manifestEl.textContent], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    const link = document.createElement("link");
-    link.rel = "manifest";
-    link.href = manifestURL;
-    document.head.appendChild(link);
-  </script>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
 
+    .content-outer {
+      border-radius: var(--border-radius);
+      box-shadow: 0 0 var(--shadow-spread) rgba(0, 0, 0, 0.15);
+      margin: 20px auto;
+      max-width: 800px;
+      background: #ffffff;
+      padding: 20px;
+    }
+
+    .header-outer {
+      background: linear-gradient(to right, #f2f2f2, #ffffff);
+      color: #333;
+      border-radius: var(--border-radius);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .Header h1 {
+      font: bold 28px Arial, sans-serif;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      margin: 0;
+    }
+
+    .Header h1 a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    .Header .description {
+      font-size: 130%;
+      margin-top: 5px;
+    }
+
+    .tabs-inner {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .tabs-inner .widget ul {
+      padding: 0;
+      background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+      border-radius: var(--border-radius);
+      display: flex;
+      justify-content: center;
+      list-style: none;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .tabs-inner .widget li a {
+      display: inline-block;
+      padding: 10px 15px;
+      font: bold 14px Arial, sans-serif;
+      border-radius: 10px;
+      background: #e6e6e6;
+      text-decoration: none;
+      color: #222;
+    }
+
+    .tabs-inner .widget li.selected a,
+    .tabs-inner .widget li a:hover {
+      background: linear-gradient(to bottom, #ffffff, #dcdcdc);
+      color: #000;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+    }
+
+    h3.post-title {
+      font: bold 24px "Georgia", serif;
+      margin-bottom: 10px;
+      color: #444;
+    }
+
+    .post-outer {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content-outer">
+    <div class="header-outer">
+      <div class="header-inner Header">
+        <h1><a href="#">EC News</a></h1>
+        <p class="description">ग्रामीण बातम्यांचा विश्वासार्ह स्रोत</p>
+      </div>
+    </div>
+
+    <div class="tabs-inner">
+      <div class="section">
+        <div class="widget">
+          <ul>
+            <li class="selected"><a href="#">मुख्यपृष्ठ</a></li>
+            <li><a href="#">बातम्या</a></li>
+            <li><a href="#">संपर्क</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-outer">
+      <div class="main-inner">
+        <div class="column-center-inner">
+          <div class="post-outer">
+            <h3 class="post-title">आजच्या ताज्या बातम्या</h3>
+            <p>गावातील शेती, शिक्षण व आरोग्य विषयक महत्वाच्या घडामोडी जाणून घ्या EC News वर.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
