@@ -1,0 +1,227 @@
+<?php
+// live-tv.php
+
+// --- 1. इंस्टॉलेशन सेटअप (Database & Uploads Directory) ---
+$dbHost = 'localhost';
+$dbUser = 'root';
+$dbPass = '';
+$dbName = 'news_app';
+
+// MySQL कनेक्शन (installation के लिए बिना डेटाबेस नाम के)
+$mysqli = new mysqli($dbHost, $dbUser, $dbPass);
+if ($mysqli->connect_error) {
+    die("DB Connection failed: " . $mysqli->connect_error);
+}
+
+// डेटाबेस बनाएँ अगर नहीं है
+$mysqli->query("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+// अब डेटाबेस से कनेक्ट करें
+$mysqli->select_db($dbName);
+
+// Users टेबल बनाएँ
+$usersTable = "CREATE TABLE IF NOT EXISTS `users` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(100) NOT NULL,
+    `email` VARCHAR(100) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `role` ENUM('journalist','admin') DEFAULT 'journalist',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+$mysqli->query($usersTable);
+
+// News Articles टेबल बनाएँ
+$newsTable = "CREATE TABLE IF NOT EXISTS `news_articles` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT,
+    `title` VARCHAR(255) NOT NULL,
+    `content` TEXT NOT NULL,
+    `file_path` VARCHAR(255),
+    `status` ENUM('pending','approved','rejected') DEFAULT 'pending',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+$mysqli->query($newsTable);
+
+// uploads डायरेक्टरी बनाएँ और परमिशन सेट करें
+$uploadDir = __DIR__ . '/uploads';
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
+
+// --- 2. हैंडलिंग रजिस्ट्रेशन और न्यूज़ सबमिशन ---
+$msg = '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // रजिस्ट्रेशन
+    if (isset($_POST['register'])) {
+        $username = $mysqli->real_escape_string($_POST['username']);
+        $email    = $mysqli->real_escape_string($_POST['email']);
+        $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+        if ($mysqli->query("INSERT INTO users (username,email,password) VALUES ('$username','$email','$password')")) {
+            $msg = "Account created successfully!";
+        } else {
+            $msg = "Registration error: " . $mysqli->error;
+        }
+    }
+    // न्यूज़ सबमिशन
+    if (isset($_POST['submit_news'])) {
+        $user_id = intval($_POST['user_id']);
+        $title   = $mysqli->real_escape_string($_POST['news_title']);
+        $content = $mysqli->real_escape_string($_POST['news_content']);
+        $file_path = '';
+        if (!empty($_FILES['news_file']['name'])) {
+            $file_path = time() . '_' . basename($_FILES['news_file']['name']);
+            move_uploaded_file($_FILES['news_file']['tmp_name'], "$uploadDir/$file_path");
+        }
+        if ($mysqli->query("INSERT INTO news_articles (user_id,title,content,file_path) VALUES ($user_id,'$title','$content','$file_path')")) {
+            $msg = "News submitted for review!";
+        } else {
+            $msg = "Submission error: " . $mysqli->error;
+        }
+    }
+}
+
+// --- 3. Approved News Fetch करें ---
+$newsResult = $mysqli->query("SELECT * FROM news_articles WHERE status='approved' ORDER BY created_at DESC");
+?>
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EC News - Live TV & Journalist Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { margin:0; font-family:'Segoe UI',sans-serif; background:#f4f4f4; color:#212529; }
+    .tv-container { position:relative; background:#000; text-align:center; padding:20px; }
+    .tv-container video { width:100%; max-width:800px; border-radius:8px; }
+    .tv-overlay { position:absolute; top:20px; left:50%; transform:translateX(-50%); color:#fff; background:rgba(0,0,0,0.6); padding:10px 20px; border-radius:5px; }
+    section { padding:30px; margin:20px auto; background:#fff; border-radius:8px; max-width:800px; }
+    h2 { margin-bottom:20px; }
+    .btn-speak { margin-top:10px; }
+    footer { text-align:center; padding:15px; background:#333; color:#fff; }
+    .news-item { margin-bottom:20px; }
+    .news-item img { max-width:100%; border-radius:5px; }
+  </style>
+</head>
+<body>
+
+  <!-- Flash Message -->
+  <?php if($msg): ?>
+    <div class="alert alert-info text-center m-3"><?= htmlspecialchars($msg) ?></div>
+  <?php endif; ?>
+
+  <!-- Live TV Section -->
+  <div class="tv-container">
+    <div class="tv-overlay">🎙️ प्रथम समाचार: पत्रकार बनून कमवा!</div>
+    <video id="liveVideo"
+           src="https://stream.ecnews.com/live/stream.m3u8"
+           controls autoplay
+           poster="https://source.unsplash.com/800x450/?news,television">
+    </video>
+  </div>
+
+  <!-- Registration Form -->
+  <section id="account-creation">
+    <h2>📋 रजिस्ट्रेशन - पत्रकार बनें</h2>
+    <form action="" method="POST">
+      <input class="form-control mb-2" type="text"  name="username" placeholder="Username" required>
+      <input class="form-control mb-2" type="email" name="email"    placeholder="Email"    required>
+      <input class="form-control mb-2" type="password" name="password" placeholder="Password" required>
+      <button class="btn btn-primary" name="register">Create Account</button>
+    </form>
+  </section>
+
+  <!-- News Submission Form -->
+  <section id="submit-news">
+    <h2>📝 न्यूज़ सबमिशन फॉर्म</h2>
+    <form action="" method="POST" enctype="multipart/form-data">
+      <!-- Production में इसे लॉगिन सिस्टम से डायनामिक करें -->
+      <input type="hidden" name="user_id" value="1">
+      <input class="form-control mb-2" type="text"     name="news_title"   placeholder="News Title"   required>
+      <textarea class="form-control mb-2" name="news_content" placeholder="News Content" rows="4" required></textarea>
+      <input class="form-control mb-3" type="file"     name="news_file"     accept="image/*,video/*">
+      <button class="btn btn-success" name="submit_news">Submit News</button>
+    </form>
+  </section>
+
+  <!-- AI Tools Section -->
+  <section id="ai-tools">
+    <h2>🤖 AI टूल्स - कंटेंट क्रिएशन</h2>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+      <a href="https://www.pictory.ai" target="_blank" class="btn btn-outline-primary me-md-2">
+        Create Video with AI
+      </a>
+      <a href="https://articlegenerator.com" target="_blank" class="btn btn-outline-success me-md-2">
+        Generate Unique Article
+      </a>
+      <a href="https://www.canva.com/create/posters/" target="_blank" class="btn btn-outline-warning">
+        Create Product Poster
+      </a>
+    </div>
+  </section>
+
+  <!-- Journalist Guide Section -->
+  <section class="journalist-info">
+    <h2>👨‍💼 पत्रकार कसे बनाल आणि कमाई कशी कराल?</h2>
+    <ul>
+      <li><strong>स्पॉन्सर्ड आर्टिकल्स:</strong> ब्रँड्ससाठी लेख लिखूं आणि ₹5,000–₹50,000 कमवा।</li>
+      <li><strong>एफिलिएट लिंक:</strong> उत्पादने प्रमोट करून 5–30% कमीशन पायें।</li>
+      <li><strong>सब्सक्रिप्शन मॉडेल:</strong> प्रीमियम कंटेंट के लिए ₹150/माह सदस्यता शुल्क।</li>
+    </ul>
+    <button class="btn btn-primary btn-speak"
+            onclick="speakText('आप EC News App मध्ये खाते उघडून पत्रकार म्हणून नोंदणी करू शकता. स्पॉन्सर्ड आर्टिकल्स, एफिलिएट मार्केटिंग, आणि सब्सक्रिप्शन मॉडेल्स वापरून पैसे कमवा.')">
+      🔊 ऐका मार्गदर्शन
+    </button>
+  </section>
+
+  <!-- ECNEWSAPP Features Section -->
+  <section class="journalist-info">
+    <h2>📲 ECNEWSAPP मध्ये तुम्ही काय करू शकता?</h2>
+    <ul>
+      <li>तुमची कथा लेख रूपात पाठवा आणि जगाला दाखवा।</li>
+      <li>फोटो आणि व्हिडिओ रिपोर्टिंग करू शकता।</li>
+      <li>लाइव स्ट्रीम से थेट प्रसारण करु शकता।</li>
+      <li>AI मॉडेलचा वापर करून लेख वाचनासाठी रूपांतरित करू शकता।</li>
+    </ul>
+    <button class="btn btn-success btn-speak"
+            onclick="speakText('EC News App मध्ये तुम्ही लेख, फोटो, व्हिडिओ अपलोड करू शकता, थेट प्रसारण करू शकता आणि AI मॉडेलचा वापर करून तुमचे लेख वाचनासाठी रूपांतरित करू शकता.')">
+      🔊 ऐका फीचर्स
+    </button>
+  </section>
+
+  <!-- Viral Articles Section -->
+  <section class="viral-info">
+    <h2>🔥 वायरल आर्टिकल्स</h2>
+    <?php while($row = $newsResult->fetch_assoc()): ?>
+      <div class="news-item">
+        <h4><?= htmlspecialchars($row['title']) ?></h4>
+        <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
+        <?php if($row['file_path']): ?>
+          <img src="uploads/<?= htmlspecialchars($row['file_path']) ?>"
+               alt=""
+               class="img-fluid mb-3">
+        <?php endif; ?>
+      </div>
+    <?php endwhile; ?>
+    <button class="btn btn-danger btn-speak"
+            onclick="speakText('तुमचा लेख व्हायरल होईल आणि आमच्या Live TV वर दाखवला जाईल, ज्यामुळे तो लाखो लोकांपर्यंत पोहोचेल.')">
+      🔊 ऐका वायरल माहिती
+    </button>
+  </section>
+
+  <footer>
+    &copy; 2025 EC News App | All Rights Reserved.
+  </footer>
+
+  <script>
+    function speakText(txt) {
+      const msg = new SpeechSynthesisUtterance(txt);
+      msg.lang = 'mr-IN';
+      window.speechSynthesis.speak(msg);
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
