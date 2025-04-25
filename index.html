@@ -6,11 +6,6 @@
   <title>EC News - Akash Chinchole</title>
 
   <style>
-    /*
-      Akash Chinchole EC News Styles
-      Fully Custom & Unique CSS
-    */
-
     :root {
       --border-radius: 10px;
       --shadow-spread: 10px;
@@ -103,6 +98,43 @@
       margin-top: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+
+    .button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #44bd32;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background-color: #2d8033;
+    }
+
+    .tv-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .tv-container video {
+      width: 100%;
+      max-width: 800px;
+      border-radius: 8px;
+    }
+
+    .tv-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #44bd32;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
   </style>
 </head>
 
@@ -112,6 +144,7 @@
       <div class="header-inner Header">
         <h1><a href="#">EC News</a></h1>
         <p class="description">ग्रामीण बातम्यांचा विश्वासार्ह स्रोत</p>
+        <p><strong>आपका स्वागत है हमारी एप में!</strong></p>
       </div>
     </div>
 
@@ -133,6 +166,88 @@
           <div class="post-outer">
             <h3 class="post-title">आजच्या ताज्या बातम्या</h3>
             <p>गावातील शेती, शिक्षण व आरोग्य विषयक महत्वाच्या घडामोडी जाणून घ्या EC News वर.</p>
+          </div>
+          
+          <!-- News Template Search Box -->
+          <input type="text" placeholder="Search News Templates" class="button" />
+
+          <!-- Reward File Section -->
+          <div>
+            <button class="button">Show Reward File</button>
+          </div>
+
+          <!-- Short Video Film Button -->
+          <div>
+            <button class="button">Create Short Film</button>
+          </div>
+
+          <!-- AI Video Creation Button -->
+          <div>
+            <button class="button">Create Video with AI</button>
+          </div>
+
+          <!-- Video Upload Camera Button -->
+          <div>
+            <button class="button">Upload Video 📷</button>
+          </div>
+
+          <!-- Journalist Account Button -->
+          <div>
+            <button class="button">Create Journalist Account</button>
+          </div>
+
+          <!-- Website App Install Button -->
+          <div>
+            <button class="button">Install EC News App</button>
+          </div>
+
+          <!-- Link Download Button -->
+          <div>
+            <button class="button">Download Link</button>
+          </div>
+
+          <!-- App Share Button -->
+          <div>
+            <button class="button">Share App</button>
+          </div>
+
+          <!-- WiFi Button -->
+          <div>
+            <button class="button">Activate Wi-Fi</button>
+          </div>
+
+          <!-- News Button -->
+          <div>
+            <button class="button">News</button>
+          </div>
+
+          <!-- Sports Button -->
+          <div>
+            <button class="button">Sports</button>
+          </div>
+
+          <!-- Short Video Button -->
+          <div>
+            <button class="button">Short Videos</button>
+          </div>
+
+          <!-- Entertainment Button -->
+          <div>
+            <button class="button">Entertainment</button>
+          </div>
+
+          <!-- Business Button -->
+          <div>
+            <button class="button">Business</button>
+          </div>
+
+          <!-- Live TV Section -->
+          <div class="tv-container">
+            <h3>🎥 लाइव टीवी</h3>
+            <video controls autoplay>
+              <source src="https://stream.ecnews.com/live/stream.m3u8" type="application/x-mpegURL">
+            </video>
+            <button class="tv-button" onclick="window.location.href='https://ecnews.github.io/ECNEWSAPP-/'">लाइव टीवी देखें</button>
           </div>
         </div>
       </div>
