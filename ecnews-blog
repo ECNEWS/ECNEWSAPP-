@@ -813,3 +813,82 @@ ${content}
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        import React, { useState } from 'react';
+        import ReactDOM from 'react-dom';
+
+        // XSS से बचने के लिए टेक्स्ट को sanitize करने का फ़ंक्शन
+        const sanitizeText = (text) => {
+          // XSS से बचने के लिए '<' और '>' को सुरक्षित HTML एंटिटी में बदलें
+          return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        };
+
+        const BlogPlatform = () => {
+          const [posts, setPosts] = useState([
+            // उदाहरण के लिए कुछ पोस्ट डेटा
+            { id: 1, title: "पहली पोस्ट", content: "यह एक कंटेंट है", location: "मुंबई", createdAt: "2025-04-26", author: "आकाश", comments: [{ author: "राहुल", text: "अच्छा पोस्ट!" }] },
+            { id: 2, title: "दूसरी पोस्ट", content: "यह दूसरी पोस्ट है", location: "पुणे", createdAt: "2025-04-25", author: "शिव", comments: [{ author: "सोनिया", text: "इंफॉर्मेटिव!" }] }
+          ]);
+          const [comment, setComment] = useState(""); // कमेंट का डेटा
+
+          // कमेंट सबमिट करने का फ़ंक्शन
+          const handleCommentSubmit = (postId) => {
+            const sanitizedComment = sanitizeText(comment); // कमेंट को sanitize करें
+            // सर्वर पर sanitizedComment भेजें (यहां हम इसे console में दिखा रहे हैं)
+            console.log(`Post ID: ${postId}, Comment: ${sanitizedComment}`);
+            setComment(""); // कमेंट को सबमिट करने के बाद खाली करें
+          };
+
+          // पोस्ट को शेयर करने का फ़ंक्शन (यह केवल उदाहरण के लिए है)
+          const sharePost = (post) => {
+            console.log(`Post shared: ${post.title}`);
+          };
+
+          return (
+            <div>
+              {/* पोस्ट्स की सूची */}
+              {posts.map((post, idx) => (
+                <div key={`${post.id}-${idx}`} className="post-card bg-white p-4 rounded shadow mb-4">
+                  <h3 className="text-xl font-semibold">{sanitizeText(post.title)}</h3>
+                  <p className="text-gray-700">{sanitizeText(post.content)}</p>
+                  <p className="text-sm text-gray-500">{sanitizeText(post.location)} | {post.createdAt} | {sanitizeText(post.author)}</p>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      placeholder="कमेंट लिखें"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="w-full border p-1 rounded mb-2"
+                    />
+                    <button onClick={() => handleCommentSubmit(post.id)} className="bg-blue-400 text-white px-2 py-1 rounded mr-2">कमेंट सबमिट करें</button>
+                    <button onClick={() => sharePost(post)} className="bg-yellow-400 text-white px-2 py-1 rounded">शेयर करें</button>
+                  </div>
+                  <ul className="mt-2 text-sm text-gray-600">
+                    {post.comments.map((c, idx) => (
+                      <li key={idx}>💬 <strong>{sanitizeText(c.author)}:</strong> {sanitizeText(c.text)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          );
+        };
+
+        // ReactDOM के माध्यम से एप्लिकेशन को रेंडर करें
+        ReactDOM.render(<BlogPlatform />, document.getElementById('root'));
+    </script>
+</body>
+</html>
