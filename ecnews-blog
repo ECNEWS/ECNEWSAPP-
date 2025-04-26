@@ -1,6 +1,95 @@
- <!DOCTYPE html>
-<html lang="mr">
+<!DOCTYPE html>
+<html lang="hi">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ब्लॉग - EC News</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f8e9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #7b1fa2;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    nav {
+      background: #4a148c;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: white;
+      padding: 1rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      background: #6a1b9a;
+    }
+    .container {
+      padding: 2rem;
+    }
+    .post {
+      background: #fff;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    h2 {
+      color: #6a1b9a;
+    }
+    footer {
+      background: #4a148c;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ब्लॉग - EC News</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">मुख्यपृष्ठ</a>
+    <a href="profile.html">प्रोफाइल</a>
+    <a href="post.html">पोस्ट</a>
+    <a href="layout.html">थीम</a>
+    <a href="settings.html">सेटिंग</a>
+    <a href="dashboard.html">कमाई</a>
+    <a href="legal.html">नीति</a>
+  </nav>
+
+  <div class="container">
+    <div class="post">
+      <h2>पोस्ट शीर्षक 1</h2>
+      <p>यहाँ ब्लॉग पोस्ट की सामग्री होगी। यह एक उदाहरण पोस्ट है, जहां आप अपनी खबर या जानकारी शेयर कर सकते हैं।</p>
+    </div>
+    <div class="post">
+      <h2>पोस्ट शीर्षक 2</h2>
+      <p>यह दूसरा उदाहरण पोस्ट है। यहाँ पर आप अपनी नयी जानकारी अपडेट कर सकते हैं।</p>
+    </div>
+    <!-- और अधिक पोस्ट्स जोड़ सकते हैं -->
+  </div>
+
+  <footer>
+    © 2025 EC News | सभी अधिकार सुरक्षित | हम दोस्त हैं, अब मालिक नहीं 😊
+  </footer>
+
+</body>
+</html>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="EC News - भारतीय पत्रकारों के लिए AI-संचालित ब्लॉगिंग प्लेटफॉर्म">
