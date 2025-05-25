@@ -250,17 +250,88 @@
 
     
 
-          <!-- Live TV Section -->
-          <div class="tv-container">
-            <h3>🎥 लाइव टीवी</h3>
-            <video controls autoplay>
-              <source src="https://stream.ecnews.com/live/stream.m3u8" type="application/x-mpegURL">
-            </video>
-            <button class="tv-button" onclick="window.location.href='https://ecnews.github.io/ECNEWSAPP-/'">लाइव टीवी देखें</button>
-          </div>
-        </div>
-      </div>
+    <!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>लाइव टीवी और वीडियो अपलोड</title>
+  <style>
+    .tv-container {
+      text-align: center;
+      padding: 20px;
+    }
+    .upload-section {
+      margin-top: 20px;
+    }
+    input[type="file"] {
+      margin: 10px 0;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #uploadStatus {
+      margin-top: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <!-- Live TV Section -->
+  <div class="tv-container">
+    <h3>🎥 लाइव टीवी</h3>
+    <video controls autoplay>
+      <source src="https://stream.ecnews.com/live/stream.m3u8" type="application/x-mpegURL">
+    </video>
+    <!-- Video Upload Section -->
+    <div class="upload-section">
+      <h4>📤 वीडियो अपलोड करें</h4>
+      <input type="file" id="videoUpload" accept="video/*" multiple>
+      <button onclick="uploadVideo()">अपलोड करें</button>
+      <div id="uploadStatus"></div>
     </div>
   </div>
+
+  <script>
+    function uploadVideo() {
+      const videoUpload = document.getElementById('videoUpload');
+      const uploadStatus = document.getElementById('uploadStatus');
+      const files = videoUpload.files;
+
+      if (files.length === 0) {
+        uploadStatus.innerHTML = 'कृपया कम से कम एक वीडियो फाइल चुनें!';
+        return;
+      }
+
+      // FormData ऑब्जेक्ट बनाकर फाइल्स को बैकएंड में भेजने के लिए तैयार करना
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('videos', files[i]);
+      }
+
+      // बैकएंड API कॉल (उदाहरण के लिए)
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        uploadStatus.innerHTML = 'वीडियो सफलतापूर्वक अपलोड हो गया!';
+        console.log(data);
+      })
+      .catch(error => {
+        uploadStatus.innerHTML = 'वीडियो अपलोड करने में त्रुटि हुई!';
+        console.error(error);
+      });
+    }
+  </script>
 </body>
 </html>
