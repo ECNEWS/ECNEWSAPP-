@@ -286,52 +286,82 @@
 </head>
 <body>
   <!-- Live TV Section -->
-  <div class="tv-container">
-    <h3>🎥 लाइव टीवी</h3>
-    <video controls autoplay>
-      <source src="https://stream.ecnews.com/live/stream.m3u8" type="application/x-mpegURL">
-    </video>
-    <!-- Video Upload Section -->
-    <div class="upload-section">
-      <h4>📤 वीडियो अपलोड करें</h4>
-      <input type="file" id="videoUpload" accept="video/*" multiple>
-      <button onclick="uploadVideo()">अपलोड करें</button>
-      <div id="uploadStatus"></div>
-    </div>
+<div class="tv-container">
+  <h3>🎥 लाइव टीवी</h3>
+  <video id="liveTV" controls autoplay></video>
+
+  <!-- Video Upload Section -->
+  <div class="upload-section">
+    <h4>📤 वीडियो अपलोड करें</h4>
+    <input type="file" id="videoUpload" accept="video/*" multiple>
+    <button onclick="uploadVideo()">अपलोड करें</button>
+    <div id="uploadStatus"></div>
   </div>
 
-  <script>
-    function uploadVideo() {
-      const videoUpload = document.getElementById('videoUpload');
-      const uploadStatus = document.getElementById('uploadStatus');
-      const files = videoUpload.files;
+  <!-- Camera Section -->
+  <div class="camera-section">
+    <h4>📷 कैमरा शुरू करें</h4>
+    <button onclick="startCamera()">कैमरा शुरू करें</button>
+  </div>
+</div>
 
-      if (files.length === 0) {
-        uploadStatus.innerHTML = 'कृपया कम से कम एक वीडियो फाइल चुनें!';
-        return;
-      }
+<script>
+  const liveTV = document.getElementById('liveTV');
+  let stream = null;
 
-      // FormData ऑब्जेक्ट बनाकर फाइल्स को बैकएंड में भेजने के लिए तैयार करना
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append('videos', files[i]);
-      }
+  // वीडियो अपलोड करने की फंक्शनैलिटी
+  function uploadVideo() {
+    const videoUpload = document.getElementById('videoUpload');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const files = videoUpload.files;
 
-      // बैकएंड API कॉल (उदाहरण के लिए)
-      fetch('/upload', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        uploadStatus.innerHTML = 'वीडियो सफलतापूर्वक अपलोड हो गया!';
-        console.log(data);
-      })
-      .catch(error => {
-        uploadStatus.innerHTML = 'वीडियो अपलोड करने में त्रुटि हुई!';
-        console.error(error);
-      });
+    if (files.length === 0) {
+      uploadStatus.innerHTML = 'कृपया कम से कम एक वीडियो फाइल चुनें!';
+      return;
     }
-  </script>
-</body>
-</html>
+
+    // पहला अपलोड किया गया वीडियो टीवी पर दिखाना
+    const videoURL = URL.createObjectURL(files[0]);
+    liveTV.src = videoURL;
+    liveTV.play();
+
+    // FormData ऑब्जेक्ट बनाकर फाइल्स को बैकएंड में भेजने के लिए तैयार करना
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('videos', files[i]);
+    }
+
+    // बैकएंड API कॉल (उदाहरण के लिए)
+    fetch('/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      uploadStatus.innerHTML = 'वीडियो सफलतापूर्वक अपलोड हो गया!';
+      console.log(data);
+    })
+    .catch(error => {
+      uploadStatus.innerHTML = 'वीडियो अपलोड करने में त्रुटि हुई!';
+      console.error(error);
+    });
+  }
+
+  // कैमरा शुरू करने की फंक्शनैलिटी
+  async function startCamera() {
+    try {
+      // पहले अगर कोई स्ट्रीम चल रहा हो तो उसे बंद करें
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      // डिवाइस के कैमरे तक पहुँच प्राप्त करना
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      liveTV.srcObject = stream;
+      liveTV.play();
+    } catch (error) {
+      console.error('कैमरा शुरू करने में त्रुटि:', error);
+      alert('कैमरा शुरू करने में त्रुटि हुई! कृपया अनुमति दें या डिवाइस चेक करें।');
+    }
+  }
+</script> 
